@@ -1,0 +1,115 @@
+---
+
+# Requires ansible>=2.3.0.
+
+- hosts: docker_targets
+  vars_files:
+    - variables/docker-setup.yml
+  become: yes
+  tasks:
+  - name: update all
+    yum:
+    args:
+      name: '*'
+      state: latest
+      skip_broken: yes
+
+  - name: install prereqs
+    yum:
+    args:
+      name:
+        - yum-utils
+        - wget
+        - device-mapper-persistent-data
+        - lvm2
+
+    # Bug in ansible yum-repository module
+    # Doesn't install full repo file
+  - name: add repository
+    shell: >
+      yum-config-manager
+      --add-repo
+      https://download.docker.com/linux/centos/docker-ce.repo
+
+    # Bug in ansible yum module
+    # Doesn't support makecache
+  - name: refresh yum cache
+    shell: >
+      yum makecache fast
+    args:
+      executable: "{{ docker.shell }}"
+      warn: no
+
+  - name: install docker-ce
+    yum:
+    args:
+      name:
+        - docker-ce
+
+  - name: start docker
+    systemd:
+      state: started
+      enabled: yes
+      name: docker
+
+    # Bug in ansible getent module.
+    # Group may already exist externally.
+  - name: does group already exist?
+    shell: "getent group {{ docker.group }}"
+    ignore_errors: yes
+    register: getent_docker_group
+    args:
+      executable: "{{ docker.shell }}"
+
+    # No bug in group module state option for external group.
+    # But creating group with same genent stdout test as user.
+  - name: create group if not present
+    group:
+    when: docker.group not in getent_docker_group.stdout
+    args:
+      name: "{{ docker.group }}"
+      state: present
+
+    # Bug in ansible getent module for external user.
+    # User may already exist externally.
+  - name: does user {{ docker.user }} already exist?
+    shell: "getent passwd {{ docker.user }}"
+    ignore_errors: yes
+    register: getent_docker_user
+    args:
+      executable: "{{ docker.shell }}"
+
+    # Bug in user module state option.
+  - name: create user {{ docker.user }} if not present
+    user:
+    when: docker.user not in getent_docker_user.stdout
+    args:
+      name: "{{ docker.user }}"
+      home: "{{ docker.home }}"
+      group: "{{ docker.group }}"
+      system: yes
+      shell: "{{ docker.shell }}"
+      state: present
+
+  - name: adding existing user {{ docker.user }} to group sudo
+    user:
+      name: "{{ docker.user }}"
+      groups: "{{ docker.group }}"
+      append: yes
+
+  - name: install docker daemon.json
+    template:
+    args:
+      src: "templates/daemon.json.j2"
+      dest: "/etc/docker/daemon.json"
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: restart docker
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      name: docker
+
+...

@@ -1,0 +1,10 @@
+---
+
+docker:
+  repo: "https://download.docker.com/linux/centos/docker-ce.repo"
+  shell: /bin/bash
+  group: docker
+  user: cbc
+  home: /home/cbc
+
+...
