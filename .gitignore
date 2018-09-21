@@ -1,4 +1,5 @@
 *~
 \#*
-*.stdout
 *.bak
+*.stdout
+*.retry
