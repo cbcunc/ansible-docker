@@ -54,7 +54,7 @@
 
     # Bug in ansible getent module.
     # Group may already exist externally.
-  - name: does group already exist?
+  - name: does {{ docker.group }} group already exist?
     shell: "getent group {{ docker.group }}"
     ignore_errors: yes
     register: getent_docker_group
@@ -63,7 +63,7 @@
 
     # No bug in group module state option for external group.
     # But creating group with same genent stdout test as user.
-  - name: create group if not present
+  - name: create group {{ docker.group }} if not present
     group:
     when: docker.group not in getent_docker_group.stdout
     args:
