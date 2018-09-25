@@ -91,7 +91,7 @@
       shell: "{{ docker.shell }}"
       state: present
 
-  - name: adding existing user {{ docker.user }} to group sudo
+  - name: adding existing user {{ docker.user }} to {{ docker.group }} group
     user:
       name: "{{ docker.user }}"
       groups: "{{ docker.group }}"
