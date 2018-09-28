@@ -27,8 +27,8 @@
     # Doesn't install full repo file
   - name: add repository
     shell: >
-      yum-config-manager
-      --add-repo
+      yum-config-manager \
+      --add-repo \
       https://download.docker.com/linux/centos/docker-ce.repo
 
     # Bug in ansible yum module
@@ -129,9 +129,44 @@
 
     - name: install miniconda
       shell: >
-           "{{ miniconda.shell}}" "{{ miniconda.installer }}" \
+           "{{ miniconda.shell }}" "{{ miniconda.installer }}" \
            -b -p ~/"{{ miniconda.path }}"
       when: stat_miniconda.stat.isdir is not defined
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: configure conda-forge
+      shell: >
+           ~/"{{ miniconda.path }}"/bin/conda \
+           config --add channels conda-forge
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: clean out incomplete package downloads
+      shell: >
+           ~/"{{ miniconda.path }}"/bin/conda \
+           clean -y --packages --tarballs
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: update conda
+      shell: >
+           ~/"{{ miniconda.path }}"/bin/conda \
+           update -y conda
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: update everything else
+      shell: >
+           ~/"{{ miniconda.path }}"/bin/conda \
+           update -y --all
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: create github3 environment
+      shell: >
+           ~/"{{ miniconda.path }}"/bin/conda \
+           create -y -n "{{ github3.environment }}" github3.py
       args:
         executable: "{{ miniconda.shell }}"
     become: yes

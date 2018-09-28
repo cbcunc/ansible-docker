@@ -12,7 +12,11 @@ miniconda:
   url_pre: "https://repo.continuum.io/miniconda"
   user: "cbc"
   mode: "600"
-  path: miniconda3
+  path: "miniconda3"
   shell: "/bin/bash"
+
+github3:
+  environment: "github3"
+  package: "github3.py"
 
 ...
