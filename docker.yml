@@ -163,12 +163,28 @@
       args:
         executable: "{{ miniconda.shell }}"
 
+    - name: check for pre-existing github3 environment
+      stat:
+      register: stat_github3
+      args:
+        path: "~/{{ miniconda.path }}/envs/{{ github3.environment }}"
+
     - name: create github3 environment
       shell: >
            ~/"{{ miniconda.path }}"/bin/conda \
            create -y -n "{{ github3.environment }}" github3.py
+      when: stat_github3.stat.isdir is not defined
       args:
         executable: "{{ miniconda.shell }}"
+
+    - name: install query_latest_compose.py
+      template:
+      args:
+        src: "templates/query_latest_compose.py.j2"
+        dest: "~/query_latest_compose.py"
+        owner: "{{ miniconda.user }}"
+        mode: 0744
+
     become: yes
     become_user: "{{ miniconda.user }}"
 

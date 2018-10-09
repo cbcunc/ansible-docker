@@ -1,0 +1,7 @@
+#!{{ miniconda.path }}/envs/{{ github3.environment }}/bin/python
+
+import github3
+gh = github3.GitHub()
+repo = gh.repository("{{ compose.org }}", "{{ compose.repo }}")
+latest = repo.latest_release().tag_name
+print(latest)

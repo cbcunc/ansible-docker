@@ -19,4 +19,8 @@ github3:
   environment: "github3"
   package: "github3.py"
 
+compose:
+  org: "docker"
+  repo: "compose" 
+
 ...
