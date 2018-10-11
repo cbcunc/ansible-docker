@@ -9,7 +9,7 @@ docker:
 
 miniconda:
   installer: "Miniconda3-latest-Linux-x86_64.sh"
-  url_pre: "https://repo.continuum.io/miniconda"
+  url: "https://repo.continuum.io/miniconda"
   user: "cbc"
   mode: "600"
   path: "miniconda3"
@@ -21,6 +21,12 @@ github3:
 
 compose:
   org: "docker"
-  repo: "compose" 
+  repo: "compose"
+  url: "https://github.com/docker/compose/releases/download"
+  dest: "/usr/local/bin/docker-compose"
+  completion:
+    url1: "https://raw.githubusercontent.com/docker/compose"
+    url2: "contrib/completion/bash/docker-compose"
+    dest: "/etc/bash_completion.d/docker-compose"
 
 ...

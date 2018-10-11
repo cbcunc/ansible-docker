@@ -123,7 +123,7 @@
       get_url:
       when: stat_miniconda.stat.isdir is not defined
       args:
-        url: "{{ miniconda.url_pre }}/{{ miniconda.installer }}"
+        url: "{{ miniconda.url }}/{{ miniconda.installer }}"
         dest: "~/{{ miniconda.installer }}"
         mode: "{{ miniconda.mode }}"
 
@@ -209,7 +209,6 @@
         echo `uname -s`-`uname -m`
       register: platform_architecture
       executable: "{{ docker.shell }}"
-      chdir: ~/
 
     - name: platform architecture
       debug:
@@ -219,8 +218,22 @@
     - name: get docker-compose
       uri:
       args:
-        url: "https://github.com/docker/compose/releases/download/{{ latest_compose.stdout }}/docker-compose-{{ platform_architecture.stdout }}"
-        dest: /usr/local/bin/docker-compose
+        url: "{{ compose.url }}/{{ latest_compose.stdout }}/docker-compose-{{ platform_architecture.stdout }}"
+        dest: "{{ compose.dest }}"
+        status_code: "200,304"
+
+    - name: make executable
+      file:
+      args:
+        path: "{{ compose.dest }}"
+        mode: "+x"
+
+    - name: get docker-compose bash completion
+      uri:
+      args:
+       url: "{{ compose.completion.url1 }}/{{ latest_compose.stdout }}/{{ compose.completion.url2 }}"
+       dest: "{{ compose.completion.dest }}"
+       status_code: "200,304"
 
     become: yes
     become_user: root
