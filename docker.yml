@@ -129,37 +129,37 @@
 
     - name: install miniconda
       shell: >
-           "{{ miniconda.shell }}" "{{ miniconda.installer }}" \
-           -b -p ~/"{{ miniconda.path }}"
+        "{{ miniconda.shell }}" ~"{{ miniconda.installer }}" \
+        -b -p ~/"{{ miniconda.path }}"
       when: stat_miniconda.stat.isdir is not defined
       args:
         executable: "{{ miniconda.shell }}"
 
     - name: configure conda-forge
       shell: >
-           ~/"{{ miniconda.path }}"/bin/conda \
-           config --add channels conda-forge
+        ~/"{{ miniconda.path }}"/bin/conda \
+        config --add channels conda-forge
       args:
         executable: "{{ miniconda.shell }}"
 
     - name: clean out incomplete package downloads
       shell: >
-           ~/"{{ miniconda.path }}"/bin/conda \
-           clean -y --packages --tarballs
+        ~/"{{ miniconda.path }}"/bin/conda \
+        clean -y --packages --tarballs
       args:
         executable: "{{ miniconda.shell }}"
 
     - name: update conda
       shell: >
-           ~/"{{ miniconda.path }}"/bin/conda \
-           update -y conda
+        ~/"{{ miniconda.path }}"/bin/conda \
+        update -y conda
       args:
         executable: "{{ miniconda.shell }}"
 
     - name: update everything else
       shell: >
-           ~/"{{ miniconda.path }}"/bin/conda \
-           update -y --all
+        ~/"{{ miniconda.path }}"/bin/conda \
+        update -y --all
       args:
         executable: "{{ miniconda.shell }}"
 
@@ -171,8 +171,8 @@
 
     - name: create github3 environment
       shell: >
-           ~/"{{ miniconda.path }}"/bin/conda \
-           create -y -n "{{ github3.environment }}" github3.py
+        ~/"{{ miniconda.path }}"/bin/conda \
+        create -y -n "{{ github3.environment }}" github3.py
       when: stat_github3.stat.isdir is not defined
       args:
         executable: "{{ miniconda.shell }}"
@@ -185,7 +185,44 @@
         owner: "{{ miniconda.user }}"
         mode: 0744
 
+      # Bug in github_release module.
+      # Doesn't allow anonymous public repo access.
+    - name: query latest compose
+      shell: >
+        ~/"{{ miniconda.path }}"/envs/"{{ github3.environment }}"/bin/python \
+        ~/query_latest_compose.py
+      register: latest_compose
+      args:
+        executable: "{{ miniconda.shell }}"
+
+    - name: latest compose
+      debug:
+      args:
+        var: latest_compose.stdout
+
     become: yes
     become_user: "{{ miniconda.user }}"
+
+  - block:
+    - name: get platform-architecture
+      shell: >
+        echo `uname -s`-`uname -m`
+      register: platform_architecture
+      executable: "{{ docker.shell }}"
+      chdir: ~/
+
+    - name: platform architecture
+      debug:
+      args:
+        var: platform_architecture.stdout
+
+    - name: get docker-compose
+      uri:
+      args:
+        url: "https://github.com/docker/compose/releases/download/{{ latest_compose.stdout }}/docker-compose-{{ platform_architecture.stdout }}"
+        dest: /usr/local/bin/docker-compose
+
+    become: yes
+    become_user: root
 
 ...

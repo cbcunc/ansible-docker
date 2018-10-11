@@ -13,7 +13,7 @@ miniconda:
   user: "cbc"
   mode: "600"
   path: "miniconda3"
-  shell: "/bin/bash"
+  shell: "/usr/bin/bash"
 
 github3:
   environment: "github3"
