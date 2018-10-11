@@ -1,1 +1,4 @@
-1. Finish the playbook
+1. Separate Miniconda3 and docker into roles.
+2. Support for Debian/Ubuntu.
+3. Fix Ansible github-release module
+
