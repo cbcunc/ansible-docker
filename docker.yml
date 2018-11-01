@@ -40,11 +40,19 @@
       executable: "{{ docker.shell }}"
       warn: no
 
-  - name: install docker-ce
+  - name: install latest docker-ce
     yum:
     args:
       name:
         - docker-ce
+    when: docker.version == "latest"
+
+  - name: install versioned docker-ce
+    yum:
+    args:
+      name:
+        - "docker-ce-{{ docker.version }}"
+    when: docker.version != "latest"
 
   - name: start docker
     systemd:
@@ -129,7 +137,7 @@
 
     - name: install miniconda
       shell: >
-        "{{ miniconda.shell }}" ~"{{ miniconda.installer }}" \
+        "{{ miniconda.shell }}" ~/"{{ miniconda.installer }}" \
         -b -p ~/"{{ miniconda.path }}"
       when: stat_miniconda.stat.isdir is not defined
       args:
@@ -208,7 +216,8 @@
       shell: >
         echo `uname -s`-`uname -m`
       register: platform_architecture
-      executable: "{{ docker.shell }}"
+      args:
+        executable: "{{ docker.shell }}"
 
     - name: platform architecture
       debug:

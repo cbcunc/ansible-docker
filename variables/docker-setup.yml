@@ -2,10 +2,12 @@
 
 docker:
   repo: "https://download.docker.com/linux/centos/docker-ce.repo"
-  shell: /bin/bash
-  group: docker
-  user: cbc
-  home: /home/cbc
+  # version: "latest"
+  version: "17.12.0.ce-1.el7.centos.x86_64"
+  shell: "/bin/bash"
+  group: "docker"
+  user: "cbc"
+  home: "/home/cbc"
 
 miniconda:
   installer: "Miniconda3-latest-Linux-x86_64.sh"
