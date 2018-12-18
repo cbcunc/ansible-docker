@@ -24,6 +24,8 @@ github3:
 compose:
   org: "docker"
   repo: "compose"
+  # version: "latest"
+  version: "1.9.0"
   url: "https://github.com/docker/compose/releases/download"
   dest: "/usr/local/bin/docker-compose"
   completion:

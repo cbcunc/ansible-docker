@@ -224,12 +224,21 @@
       args:
         var: platform_architecture.stdout
 
-    - name: get docker-compose
+    - name: get latest docker-compose
       uri:
       args:
         url: "{{ compose.url }}/{{ latest_compose.stdout }}/docker-compose-{{ platform_architecture.stdout }}"
         dest: "{{ compose.dest }}"
         status_code: "200,304"
+      when: compose.version == "latest"
+
+    - name: get versioned docker-compose
+      uri:
+      args:
+        url: "{{ compose.url }}/{{ compose.version }}/docker-compose-{{ platform_architecture.stdout }}"
+        dest: "{{ compose.dest }}"
+        status_code: "200,304"
+      when: compose.version != "latest"
 
     - name: make executable
       file:
@@ -237,12 +246,21 @@
         path: "{{ compose.dest }}"
         mode: "+x"
 
-    - name: get docker-compose bash completion
+    - name: get latest docker-compose bash completion
       uri:
       args:
-       url: "{{ compose.completion.url1 }}/{{ latest_compose.stdout }}/{{ compose.completion.url2 }}"
-       dest: "{{ compose.completion.dest }}"
-       status_code: "200,304"
+        url: "{{ compose.completion.url1 }}/{{ latest_compose.stdout }}/{{ compose.completion.url2 }}"
+        dest: "{{ compose.completion.dest }}"
+        status_code: "200,304"
+      when: compose.version == "latest"
+
+    - name: get versioned docker-compose bash completion
+      uri:
+      args:
+        url: "{{ compose.completion.url1 }}/{{ compose.version }}/{{ compose.completion.url2 }}"
+        dest: "{{ compose.completion.dest }}"
+        status_code: "200,304"
+      when: compose.version != "latest"
 
     become: yes
     become_user: root
