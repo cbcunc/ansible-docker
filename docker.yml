@@ -20,7 +20,6 @@
       name:
         - yum-utils
         - wget
-        - device-mapper-persistent-data
         - lvm2
 
     # Bug in ansible yum-repository module
