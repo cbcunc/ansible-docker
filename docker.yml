@@ -26,15 +26,13 @@
     # Doesn't install full repo file
   - name: add repository
     shell: >
-      yum-config-manager \
-      --add-repo \
-      https://download.docker.com/linux/centos/docker-ce.repo
+      yum-config-manager --add-repo "{{ docker.repo }}"
 
     # Bug in ansible yum module
     # Doesn't support makecache
   - name: refresh yum cache
     shell: >
-      yum makecache fast
+      yum makecache
     args:
       executable: "{{ docker.shell }}"
       warn: no

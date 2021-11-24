@@ -24,8 +24,9 @@ github3:
 compose:
   org: "docker"
   repo: "compose"
-  version: "latest"
-  # version: "1.9.0"
+  # latest docker compose v2 requires conversion from v1
+  # version: "latest"
+  version: "1.29.2"
   url: "https://github.com/docker/compose/releases/download"
   dest: "/usr/local/bin/docker-compose"
   completion:
