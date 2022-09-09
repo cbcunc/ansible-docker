@@ -1,5 +1,7 @@
 # ansible-docker
 
+### This is all kinds of deprecated.
+
 Installs the most recent docker, docker-compose, and docker-compose bash completion
 from the official docker repositories instead of Linux distribution repositories.
 
